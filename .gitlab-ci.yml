@@ -1,0 +1,26 @@
+stages:
+  - build
+  - install
+
+build:
+  image: node:16
+  stage: build
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+    expire_in: 1 week
+
+install:
+  image: cypress/browsers:node-22.11.0-chrome-130.0.6723.69-1-ff-132.0-edge-130.0.2849.56-1
+  stage: install
+  script:
+    - npm ci
+    - npm install mochawesome --save-dev
+    - npm start &
+    - npx cypress run --browser chrome --reporter mochawesome --reporter-options reportDir=cypress/results
+  artifacts:
+    paths:
+      - cypress/results/
+    expire_in: 1 week
